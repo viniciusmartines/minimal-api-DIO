@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace MinimalAPI.Migrations
+namespace mininal_api.Migrations
 {
     /// <inheritdoc />
     public partial class SeedAdministrador : Migration

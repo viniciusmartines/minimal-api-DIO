@@ -1,10 +1,10 @@
-using MinimalAPI.Dominio.Enuns;
+using MinimalApi.Dominio.Enuns;
 
-namespace MinimalAPI.Dominio.ModelViews;
+namespace MinimalApi.Dominio.ModelViews;
 
 public record AdministradorModelView
 {
-    public int Id { get; set; } = default!;
-    public string Email { get; set; } = default!;
-    public string Perfil { get; set; } = default!;
+    public int Id { get;set; } = default!;
+    public string Email { get;set; } = default!;
+    public string Perfil { get;set; } = default!;
 }

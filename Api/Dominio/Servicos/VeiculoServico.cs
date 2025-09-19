@@ -1,58 +1,55 @@
+using MinimalApi.Dominio.Entidades;
+using MinimalApi.DTOs;
+using MinimalApi.Infraestrutura.Db;
+using MinimalApi.Dominio.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MinimalAPI.Dominio.Entidades;
-using MinimalAPI.Dominio.Interfaces;
-using MinimalAPI.DTOs;
-using MinimalAPI.Infraestrutura.Db;
 
-namespace MinimalAPI.Dominio.Servicos
+namespace MinimalApi.Dominio.Servicos;
+
+public class VeiculoServico : IVeiculoServico
 {
-    public class VeiculoServico : IVeiculoServico
+    private readonly DbContexto _contexto;
+    public VeiculoServico(DbContexto contexto)
     {
-        public VeiculoServico(DbContexto contexto)
+        _contexto = contexto;
+    }
+
+    public void Apagar(Veiculo veiculo)
+    {
+        _contexto.Veiculos.Remove(veiculo);
+        _contexto.SaveChanges();
+    }
+
+    public void Atualizar(Veiculo veiculo)
+    {
+        _contexto.Veiculos.Update(veiculo);
+        _contexto.SaveChanges();
+    }
+
+    public Veiculo? BuscaPorId(int id)
+    {
+        return _contexto.Veiculos.Where(v => v.Id == id).FirstOrDefault();
+    }
+
+    public void Incluir(Veiculo veiculo)
+    {
+        _contexto.Veiculos.Add(veiculo);
+        _contexto.SaveChanges();
+    }
+
+    public List<Veiculo> Todos(int? pagina = 1, string? nome = null, string? marca = null)
+    {
+        var query = _contexto.Veiculos.AsQueryable();
+        if(!string.IsNullOrEmpty(nome))
         {
-            _contexto = contexto;
+            query = query.Where(v => EF.Functions.Like(v.Nome.ToLower(), $"%{nome}%"));
         }
 
-        private readonly DbContexto _contexto;
+        int itensPorPagina = 10;
 
-        public List<Veiculo> Todos(int? pagina = 1, string? nome = null, string? marca = null)
-        {
-            var query = _contexto.Veiculos.AsQueryable();
-            if (!string.IsNullOrEmpty(nome))
-            {
-                query = query.Where(v => EF.Functions.Like(v.Nome.ToLower(), $"%{nome}%"));
-            }
+        if(pagina != null)
+            query = query.Skip(((int)pagina - 1) * itensPorPagina).Take(itensPorPagina);
 
-            int itensPorPagina = 10;
-            if (pagina != null)
-            {
-                query = query.Skip(((int)pagina - 1) * itensPorPagina).Take(itensPorPagina);
-            }
-
-            return query.ToList();
-        }
-
-        public Veiculo? BuscaPorId(int id)
-        {
-            return _contexto.Veiculos.Where(v => v.Id == id).FirstOrDefault();
-        }
-
-        public void Incluir(Veiculo veiculo)
-        {
-            _contexto.Veiculos.Add(veiculo);
-            _contexto.SaveChanges();
-        }
-
-        public void Atualizar(Veiculo veiculo)
-        {
-            _contexto.Veiculos.Update(veiculo);
-            _contexto.SaveChanges();
-        }
-
-        public void Apagar(Veiculo veiculo)
-        {
-            _contexto.Veiculos.Remove(veiculo);
-            _contexto.SaveChanges();
-        }
+        return query.ToList();
     }
 }
